@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form_study/validators/EmailValidator.dart';
 
 class ResetPasswordPage extends StatefulWidget {
 
@@ -14,6 +15,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  EmailValidator _emailValidator;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailValidator = new EmailValidator();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +119,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   TextFormField emailTextField() {
     return TextFormField(
-      validator: _validateEmail,
+      validator: _emailValidator.validateEmail,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: "E-mail",
@@ -135,30 +144,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       style: TextStyle(fontSize: 29, fontWeight: FontWeight.w500),
       textAlign: TextAlign.center,
     );
-  }
-
-  String _validateEmail(String value) {
-    if (value.isEmpty) {
-      // The form is empty
-      return "Enter email address";
-    }
-    // This is just a regular expression for email addresses
-    String p = "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}" +
-        "\\@" +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
-        "(" +
-        "\\." +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-        ")+";
-    RegExp regExp = new RegExp(p);
-
-    if (regExp.hasMatch(value)) {
-      // So, the email is valid
-      return null;
-    }
-
-    // The pattern of the email didn't match the regex above.
-    return 'Email is not valid';
   }
 
   void _validateInputs() {

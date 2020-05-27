@@ -1,16 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:form_study/pages/PrimeiroAcesso.dart';
+import 'package:form_study/validators/EmailValidator.dart';
+import 'package:form_study/validators/CamposObrigatoriosValidator.dart';
 
 import 'ResetPasswordPage.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+
+  bool _autoValidate = false;
+  EmailValidator _emailValidator;
+  CamposObrigatoriosValidator _camposObrigatoriosValidator;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailValidator = new EmailValidator();
+    _camposObrigatoriosValidator = new CamposObrigatoriosValidator();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: Container(
         padding: EdgeInsets.only(top: 60, left: 40, right: 40),
         color: Colors.white,
-        child: ListView(
+        child: new Form(
+        key: _formKey,
+        autovalidate: _autoValidate,
+        child: new ListView(
           children: <Widget>[
             imagemLogo(),
             SizedBox(height: 20,),
@@ -27,7 +53,8 @@ class LoginPage extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   SizedBox imagemLogo() {
@@ -107,7 +134,7 @@ class LoginPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                onPressed: ()=>{},
+                onPressed: _validateInputs,
               ),
             ),
           );
@@ -130,6 +157,7 @@ class LoginPage extends StatelessWidget {
     return TextFormField(
             obscureText: true,
             keyboardType: TextInputType.text,
+            validator: _camposObrigatoriosValidator.validate,
             decoration: InputDecoration(
               labelText: "Senha",
               labelStyle: TextStyle( color: Colors.black38, fontWeight: FontWeight.w400, fontSize: 20 ),
@@ -141,10 +169,29 @@ class LoginPage extends StatelessWidget {
     return TextFormField(
             autofocus: true,
             keyboardType: TextInputType.emailAddress,
+            validator: _emailValidator.validateEmail,
             decoration: InputDecoration(
               labelText: "E-mail",
               labelStyle: TextStyle( color: Colors.black38, fontWeight: FontWeight.w400, fontSize: 20 ),
             ),
           );
+  }
+
+  void _validateInputs() {
+
+    final form = _formKey.currentState;
+
+    if ( form.validate() ) {
+
+      // Every of the data in the form are valid at this point
+      form.save();
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => new AlertDialog(
+            content: new Text("All inputs are valid"),
+          ));
+    } else {
+      setState(() => _autoValidate = true);
+    }
   }
 }
